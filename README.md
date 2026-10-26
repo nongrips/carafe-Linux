@@ -45,6 +45,10 @@ with Box64 or FEX to run x86 code, DXVK for Direct3D and Mesa for the GPU.
 - [DBI](https://github.com/rashevskyv/dbi) on the console for installing over USB.
 - Windows 10 or 11, x64 or ARM64.
 
+## Linux (experimental)
+
+Linux build instructions and current limitations: [docs/linux.md](docs/linux.md).
+
 ## Download
 
 Get the installer from the [latest release](https://github.com/carafe-nx/carafe/releases/latest):

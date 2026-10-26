@@ -17,3 +17,10 @@ services:
     <<: *build
     image: mstorsjo/llvm-mingw:20260505@sha256:974eec0b217e2a97cca35d7418741be32a55880010620937497a2a78e73cd482
     command: make -C tools/hacbrewpack
+
+  hacbrewpack-linux:
+    <<: *build
+    build:
+      context: docker
+      dockerfile: Dockerfile.hacbrewpack-linux
+    command: make -C tools/hacbrewpack linux

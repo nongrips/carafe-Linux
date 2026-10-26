@@ -7,7 +7,7 @@ ARCHES := aarch64 x86_64
 EXES := $(foreach arch,$(ARCHES),$(OUT)/hacbrewpack-$(arch)-pc-windows-msvc.exe)
 PATCHES := $(sort $(wildcard $(CURDIR)/patches/*.patch))
 
-.PHONY: all fetch clean
+.PHONY: all fetch clean linux
 
 all: $(EXES)
 
@@ -30,4 +30,20 @@ $(OUT)/hacbrewpack-%-pc-windows-msvc.exe: hacbrewpack.manifest manifest.rc $(PAT
 	cp $(BUILD)/$*/hacbrewpack.exe $@
 
 clean:
-	rm -rf $(BUILD) $(EXES)
+	rm -rf $(BUILD) $(EXES) $(LINUX_OUT)
+
+LINUX_ARCH := $(shell uname -m)
+LINUX_OUT := $(OUT)/hacbrewpack-$(LINUX_ARCH)-unknown-linux-gnu
+
+linux: $(LINUX_OUT)
+
+$(LINUX_OUT): $(PATCHES) | fetch
+	rm -rf $(BUILD)/linux-$(LINUX_ARCH)
+	mkdir -p $(BUILD)/linux-$(LINUX_ARCH) $(OUT)
+	cp -r $(SRC)/. $(BUILD)/linux-$(LINUX_ARCH)/
+	rm -f $(BUILD)/linux-$(LINUX_ARCH)/.git
+	for patch in $(PATCHES); do git -C $(BUILD)/linux-$(LINUX_ARCH) apply $$patch || exit 1; done
+	printf 'CC = cc\nCFLAGS = -O2 -Wall -Wextra -std=gnu11\nLDFLAGS = -lmbedtls -lmbedx509 -lmbedcrypto\n' > $(BUILD)/linux-$(LINUX_ARCH)/config.mk
+	$(MAKE) -C $(BUILD)/linux-$(LINUX_ARCH)/mbedtls lib CC=cc AR=ar
+	$(MAKE) -C $(BUILD)/linux-$(LINUX_ARCH) hacbrewpack CC=cc
+	install -m 755 $(BUILD)/linux-$(LINUX_ARCH)/hacbrewpack $@

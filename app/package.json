@@ -3,7 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "workspaces": ["ui"],
+  "workspaces": [
+    "ui"
+  ],
   "engines": {
     "node": ">=24"
   },
@@ -18,7 +20,11 @@
     "cdp": "node scripts/cdp.mjs",
     "tauri": "tauri",
     "bindings": "cargo test --workspace --quiet",
-    "check": "cargo fmt --all --check && cargo clippy --workspace --all-targets -- -D warnings && cargo test --workspace --quiet && npm run check --workspace ui"
+    "check": "cargo fmt --all --check && cargo clippy --workspace --all-targets -- -D warnings && cargo test --workspace --quiet && npm run check --workspace ui",
+    "hacbrewpack:linux": "docker compose -f ../compose.yaml run --rm hacbrewpack-linux",
+    "dev:linux": "npm run runtime && npm run hacbrewpack:linux && npm run dev:app",
+    "build:linux": "npm run runtime && npm run hacbrewpack:linux && npm run build:linux:app",
+    "build:linux:app": "npm run pack && tauri build --config crates/carafe-desktop/tauri.release.conf.json --config crates/carafe-desktop/tauri.linux.conf.json"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.12.2"
