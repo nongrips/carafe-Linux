@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
+      - 'packaging/**'
       - 'app/**'
       - 'tools/hacbrewpack/**'
       - 'docker/**'
@@ -33,6 +34,10 @@ jobs:
           rustup update stable --no-self-update
           rustup default stable
           rustup component add rustfmt clippy
+      - name: Validate CachyOS packaging scripts
+        run: |
+          bash -n packaging/cachyos/PKGBUILD
+          sh -n packaging/cachyos/carafe
       - run: npm ci
         working-directory: app
       - name: Check and test

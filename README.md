@@ -47,7 +47,7 @@ with Box64 or FEX to run x86 code, DXVK for Direct3D and Mesa for the GPU.
 
 ## Linux (experimental)
 
-Linux build instructions and current limitations: [docs/linux.md](docs/linux.md).
+CachyOS/Arch pacman packaging, Linux build instructions and current limitations: [docs/linux.md](docs/linux.md).
 
 ## Download
 
