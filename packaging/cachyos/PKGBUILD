@@ -1,0 +1,40 @@
+# Maintainer: nongrips
+pkgname=carafe-git
+pkgver=0.0.0.r0
+pkgrel=1
+pkgdesc='Build Nintendo Switch NSPs from Windows game folders (experimental Linux port)'
+arch=('x86_64')
+url='https://github.com/nongrips/carafe-Linux'
+license=('GPL-3.0-or-later')
+depends=('webkit2gtk-4.1' 'gtk3' 'libayatana-appindicator' 'openssl' 'xdg-utils')
+makedepends=('git' 'base-devel' 'rust' 'nodejs' 'npm' 'docker' 'docker-compose')
+provides=('carafe')
+conflicts=('carafe')
+source=('carafe::git+https://github.com/nongrips/carafe-Linux.git#branch=feat/linux-packaging')
+sha256sums=('SKIP')
+
+pkgver() {
+  cd "$srcdir/carafe"
+  printf '0.0.0.r%s.g%s' "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+build() {
+  cd "$srcdir/carafe/app"
+  if ! docker info >/dev/null 2>&1; then
+    printf '%s\n' 'Docker must be running and accessible to the build user.' >&2
+    return 1
+  fi
+  npm ci
+  npm run build:cachyos
+}
+
+package() {
+  cd "$srcdir/carafe"
+  install -Dm755 app/target/release/carafe-desktop "$pkgdir/usr/lib/carafe-desktop/carafe-desktop"
+  install -Dm755 app/crates/carafe-desktop/binaries/hacbrewpack-x86_64-unknown-linux-gnu "$pkgdir/usr/lib/carafe-desktop/hacbrewpack"
+  install -Dm644 app/crates/carafe-desktop/resources/carafe-runtime.bin "$pkgdir/usr/lib/carafe-desktop/carafe-runtime.bin"
+  install -Dm755 packaging/cachyos/carafe "$pkgdir/usr/bin/carafe"
+  install -Dm644 packaging/cachyos/carafe.desktop "$pkgdir/usr/share/applications/app.carafe.builder.desktop"
+  install -Dm644 assets/logo/icon/256.png "$pkgdir/usr/share/icons/hicolor/256x256/apps/app.carafe.builder.png"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

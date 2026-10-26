@@ -42,25 +42,29 @@ const HACBREWPACK: &str = "hacbrewpack";
 
 /// Starts the application; if Tauri fails to start it, prints the error and exits the process with code 1.
 pub fn run() {
-    let services = Services::new(
-        Arc::new(DiskGameStore),
-        Arc::new(DiskFolderInspector),
-        Arc::new(HacBrewPacker::new(runtime_archive(), sidecar(HACBREWPACK))),
-        Arc::new(MtpDevice),
-        Arc::new(FileKeysChecker),
-        Arc::new(FileImageReader),
-        Arc::new(SteamGridDb::new()),
-        Arc::new(DiskRegistryFiles),
-        RUNTIME_VERSION,
-        RuntimeCapabilities { stable_x64: false },
-    );
     let result = tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .manage(services)
         .manage(Rebuilds::default())
         .manage(Builds::default())
         .setup(|app| {
+            let services = Services::new(
+                Arc::new(DiskGameStore),
+                Arc::new(DiskFolderInspector),
+                Arc::new(HacBrewPacker::new(
+                    runtime_archive(app.path()),
+                    sidecar(HACBREWPACK),
+                )),
+                Arc::new(MtpDevice),
+                Arc::new(FileKeysChecker),
+                Arc::new(FileImageReader),
+                Arc::new(SteamGridDb::new()),
+                Arc::new(DiskRegistryFiles),
+                RUNTIME_VERSION,
+                RuntimeCapabilities { stable_x64: false },
+            );
+
+            app.manage(services);
             app.manage(Updates::new(updates::enabled(app.handle())));
             let services = app.state::<Services>();
             let file = app
@@ -158,12 +162,12 @@ fn sidecar(name: &str) -> PathBuf {
         .unwrap_or_else(|| PathBuf::from(file))
 }
 
-/// Returns the runtime archive: next to the application executable if it is there (that is where the
-/// installer places it), otherwise the crate's `resources/carafe-runtime.bin` for development.
-fn runtime_archive() -> PathBuf {
-    std::env::current_exe()
+/// Returns the bundled runtime archive, or the source archive during development.
+fn runtime_archive<R: Runtime>(paths: &PathResolver<R>) -> PathBuf {
+    paths
+        .resource_dir()
+        .map(|dir| dir.join(RUNTIME_ARCHIVE))
         .ok()
-        .and_then(|exe| exe.parent().map(|dir| dir.join(RUNTIME_ARCHIVE)))
         .filter(|path| path.is_file())
         .unwrap_or_else(|| PathBuf::from(DEV_RUNTIME_ARCHIVE))
 }

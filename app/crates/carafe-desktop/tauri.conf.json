@@ -24,8 +24,13 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis"],
-    "icon": ["../../../assets/logo/icon.ico"],
+    "targets": [
+      "nsis"
+    ],
+    "icon": [
+      "../../../assets/logo/icon/256.png",
+      "../../../assets/logo/icon.ico"
+    ],
     "windows": {
       "nsis": {
         "installMode": "currentUser",
@@ -51,7 +56,9 @@
   "plugins": {
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEZFM0ZGQTUwOEI4N0Y5QTMKUldTaitZZUxVUG8vL3FyNmdrN0lNZ1BhU2NnYkVxRkNNL3NSbG1ZQWtKS3BKOUxpcGRXSVpLQVgK",
-      "endpoints": ["https://github.com/carafe-nx/carafe/releases/latest/download/latest.json"],
+      "endpoints": [
+        "https://github.com/carafe-nx/carafe/releases/latest/download/latest.json"
+      ],
       "requireSignedVersion": true,
       "windows": {
         "installMode": "passive"

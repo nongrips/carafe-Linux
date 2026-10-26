@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Carafe
+Comment=Build Nintendo Switch apps from Windows game folders
+Exec=carafe
+Icon=app.carafe.builder
+Terminal=false
+Categories=Game;Utility;
+StartupWMClass=carafe-desktop

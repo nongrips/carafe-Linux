@@ -115,7 +115,8 @@ impl Updates {
 
 /// Returns whether this build may update itself: a release build with a release version.
 pub fn enabled(app: &AppHandle) -> bool {
-    !cfg!(debug_assertions)
+    cfg!(target_os = "windows")
+        && !cfg!(debug_assertions)
         && running_version(app).is_some_and(|version| version.to_string() != "0.0.0")
 }
 
